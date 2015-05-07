@@ -66,7 +66,7 @@ func (r *room) run() {
 	}
 }
 
-func (room *room) ServeHttp(w http.ResponseWriter, r *http.Request) {
+func (room *room) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	socket, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal("websocket.upgrader:", err)
