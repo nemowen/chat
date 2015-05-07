@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
 
 type room struct {
@@ -29,6 +30,15 @@ var (
 		WriteBufferSize: socketBufferSize,
 	}
 )
+
+func newRoom() *room {
+	return &room{
+		forward: make(chan []byte),
+		join:    make(chan *client),
+		leave:   make(chan *client),
+		clients: make(map[*client]bool),
+	}
+}
 
 func (r *room) run() {
 	for {
