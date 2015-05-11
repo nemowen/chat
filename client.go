@@ -34,4 +34,5 @@ func (c *client) write() {
 		}
 	}
 	c.socket.Close()
+	
 }
