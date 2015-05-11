@@ -7,9 +7,11 @@ import (
 	"github.com/stretchr/gomniauth/providers/facebook"
 	"github.com/stretchr/gomniauth/providers/github"
 	"github.com/stretchr/gomniauth/providers/google"
+	"github.com/stretchr/objx"
 	"html/template"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"sync"
@@ -25,10 +27,18 @@ func (t *templateHandle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.fileName)))
 	})
-	t.templ.Execute(w, r)
+	data := map[string]interface{}{
+		"Host": r.Host,
+	}
+	if authCookie, err := r.Cookie("auth"); err == nil {
+		data["UserData"] = objx.MustFromBase64(authCookie.Value)
+	}
+
+	t.templ.Execute(w, data)
 }
 
 func main() {
+
 	var addr = flag.String("addr", ":1987", "The addr of the application.")
 	flag.Parse()
 
@@ -36,11 +46,11 @@ func main() {
 	gomniauth.SetSecurityKey("some long key")
 	gomniauth.WithProviders(
 		facebook.New("key", "secret",
-			"http://localhost:8080/auth/callback/facebook"),
+			"http://localhost:1987/auth/callback/facebook"),
 		github.New("223d6897398e1a2bdb2c", "6681159769dc9c480feb796c1b251d0fe39fb6ae",
-			"http://localhost:8080/auth/callback/github"),
+			"http://localhost:1987/auth/callback/github"),
 		google.New("key", "secret",
-			"http://localhost:8080/auth/callback/google"),
+			"http://localhost:1987/auth/callback/google"),
 	)
 
 	r := newRoom()
