@@ -43,7 +43,7 @@ func main() {
 	flag.Parse()
 
 	// set up gomniauth
-	gomniauth.SetSecurityKey("some long key")
+	gomniauth.SetSecurityKey("23refwrtwt34tgthtyjngnhjgyiyujnbfsdfsd")
 	gomniauth.WithProviders(
 		facebook.New("key", "secret",
 			"http://localhost:1987/auth/callback/facebook"),

@@ -1,24 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
+	"time"
 )
 
-// client represents a single chatting user.
+// client 代表一个聊天的用户.
 type client struct {
-	// socket is the web socket for this client.
+	// 一个网页socket连接.
 	socket *websocket.Conn
-	// send is a channel on which messages are sent.
-	send chan []byte
-	// room is the room this client is chatting in.
+	// 发送消息的.
+	send chan *message
+	// 用户报在的房间.
 	room *room
+	// 用户数据
+	userData map[string]interface{}
 }
 
 func (c *client) read() {
 	for {
-		if msgtype, msg, err := c.socket.ReadMessage(); err == nil {
-			fmt.Println("msgtype:", msgtype)
+		var msg *message
+		if err := c.socket.ReadJSON(&msg); err == nil {
+			msg.Name = c.userData["name"].(string)
+			msg.When = time.Now()
 			c.room.forward <- msg
 		} else {
 			break
@@ -29,10 +33,10 @@ func (c *client) read() {
 
 func (c *client) write() {
 	for msg := range c.send {
-		if err := c.socket.WriteMessage(websocket.TextMessage, msg); err != nil {
+		if err := c.socket.WriteJSON(msg); err != nil {
 			break
 		}
 	}
 	c.socket.Close()
-	
+
 }
