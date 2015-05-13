@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	//"github.com/nemowen/trace"
+	"github.com/nemowen/trace"
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/gomniauth/providers/facebook"
 	"github.com/stretchr/gomniauth/providers/github"
@@ -12,7 +12,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
-	//"os"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -52,7 +52,7 @@ func main() {
 	)
 
 	r := newRoom()
-	//r.tracer = trace.New(os.Stdout) // using our new trace
+	r.tracer = trace.New(os.Stdout) // using our new trace
 
 	//http.Handle("/assets", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets/js"))))
 	http.Handle("/login", &templateHandle{fileName: "login.html"})
