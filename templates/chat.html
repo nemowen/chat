@@ -9,9 +9,11 @@
 	<body>
 		<ul id="messages"></ul>
 		<form id="chatbox">
+			<img src="{{.UserData.avatar_url}}" style="width: 20px; vertical-align: middle; margin: 1px 4px 1px 0px;">
 			{{.UserData.name}}</br>
 			<textarea></textarea>
 			<input type="submit" value="Send"></input>
+			or <a href="/logout">sign out</a>
 		</form>
 		<script src="//cdnjscn.b0.upaiyun.com/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
 	    <script>
@@ -42,8 +44,9 @@
 	            messages.append(
 			    	$("<li>").append(
 						$("<img>").css({
-							width:50,
-							verticalAlign:"middle"
+							width:20,
+							verticalAlign:"middle",
+							margin:"1px 4px 1px 0"
 						}).attr("src", msg.AvatarURL),
 						$("<strong>").text(msg.Name + ": "),
 						$("<span>").text(msg.Message)

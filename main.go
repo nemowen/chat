@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/nemowen/trace"
+	//"github.com/nemowen/trace"
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/gomniauth/providers/facebook"
 	"github.com/stretchr/gomniauth/providers/github"
@@ -12,7 +12,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
+	//"os"
 	"path/filepath"
 	"sync"
 )
@@ -52,11 +52,12 @@ func main() {
 	)
 
 	r := newRoom()
-	r.tracer = trace.New(os.Stdout) // using our new trace
+	//r.tracer = trace.New(os.Stdout) // using our new trace
 
-	http.Handle("/chat", MustAuth(&templateHandle{fileName: "chat.html"}))
 	//http.Handle("/assets", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets/js"))))
 	http.Handle("/login", &templateHandle{fileName: "login.html"})
+	http.HandleFunc("/logout", logout)
+	http.Handle("/chat", MustAuth(&templateHandle{fileName: "chat.html"}))
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
 	go r.run()
@@ -65,4 +66,15 @@ func main() {
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   "auth",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	})
+	w.Header()["Location"] = []string{"/chat"}
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
