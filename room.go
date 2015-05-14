@@ -10,19 +10,17 @@ import (
 )
 
 type room struct {
-	// forward is a channel that holds incoming messages
-	// that should be forwarded to the other clients.
+	// 转发消息给其它它客户端的通道
 	forward chan *message
-	// join is a channel for clients wishing to join the room.
+	// 要客户端加入到room的通道
 	join chan *client
-	// leave is a channel for clients wishing to leave the room.
+	// 要退出的客户端通道
 	leave chan *client
-	// clients holds all current clients in this room.
+	// 所有客户端的map集合
 	clients map[*client]bool
-	// tracer will receive trace information of activity
-	// in the room.
+	// 跟踪消息对象
 	tracer trace.Tracer
-	// avatar is how avatar information will be obtained.
+	// 关于用户的头像
 	avatar Avatar
 }
 
@@ -63,14 +61,14 @@ func (r *room) run() {
 			r.tracer.Trace("a client left")
 		case msg := <-r.forward:
 			r.tracer.Trace("received message: ", msg.Name, msg.When, msg.Message)
-			// forward message to all clients
+			// 转发消息到所有用户
 			for client := range r.clients {
 				select {
 				case client.send <- msg:
-					// send the message
+					// 发送消息成功
 					r.tracer.Trace("-- send message to client")
 				default:
-					// failed to send
+					// 发送失败,删除用户
 					delete(r.clients, client)
 					close(client.send)
 					r.tracer.Trace("-- failed to send, cleared up client")
