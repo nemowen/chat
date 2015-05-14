@@ -53,8 +53,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	case "callback":
 		provider, err := gomniauth.Provider(provider)
 		if err != nil {
-			log.Fatalln("在尝试获取提供者时出错", provider,
-				"-", err)
+			log.Fatalln("在尝试获取提供者时出错", provider, "-", err)
 		}
 		creds, err := provider.CompleteAuth(objx.MustFromURLQuery(r.URL.RawQuery))
 		if err != nil {
@@ -66,10 +65,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatalln("在尝试从%s获取用户数据时出错", provider, "-", err)
 		}
 
-		// 取得名称差使用Base64编码,将其写入到cookie中
+		// 取得名称使用Base64编码,将其写入到cookie中
 		authCookieValue := objx.New(map[string]interface{}{
+			"userid":     userId,
 			"name":       user.Name(),
 			"avatar_url": user.AvatarURL(),
+			"email":      user.Email(),
 		}).MustBase64()
 		http.SetCookie(w, &http.Cookie{
 			Name:  "auth",

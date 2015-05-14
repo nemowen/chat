@@ -51,7 +51,7 @@ func main() {
 		google.New("key", "secret", "http://localhost:1987/auth/callback/google"),
 	)
 
-	r := newRoom()
+	r := newRoom(UserGravatar)
 	r.tracer = trace.New(os.Stdout) // using our new trace
 
 	//http.Handle("/assets", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets/js"))))
