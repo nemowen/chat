@@ -67,7 +67,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// 取得名称使用Base64编码,将其写入到cookie中
 		authCookieValue := objx.New(map[string]interface{}{
-			"userid":     userId,
 			"name":       user.Name(),
 			"avatar_url": user.AvatarURL(),
 			"email":      user.Email(),
