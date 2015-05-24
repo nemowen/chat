@@ -25,7 +25,8 @@ type templateHandle struct {
 
 func (t *templateHandle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
-		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.fileName)))
+		t.templ = template.Must(template.ParseFiles(filepath.Join("templates",
+			t.fileName)))
 	})
 	data := map[string]interface{}{
 		"Host": r.Host,
@@ -51,15 +52,18 @@ func main() {
 		google.New("key", "secret", "http://localhost:1987/auth/callback/google"),
 	)
 
-	r := newRoom(UserGravatar)
+	r := newRoom(UseFileSystemAvatar)
 	r.tracer = trace.New(os.Stdout) // using our new trace
-
-	//http.Handle("/assets", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets/js"))))
 	http.Handle("/login", &templateHandle{fileName: "login.html"})
 	http.HandleFunc("/logout", logout)
 	http.Handle("/chat", MustAuth(&templateHandle{fileName: "chat.html"}))
+	http.Handle("/upload", &templateHandle{fileName: "upload.html"})
+	http.HandleFunc("/uploader", uploadHandler)
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
+
+	http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(
+		http.Dir("./avatars"))))
 	go r.run()
 
 	log.Println("Starting web server on port", *addr)

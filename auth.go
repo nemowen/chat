@@ -1,9 +1,11 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/objx"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -62,11 +64,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		user, err := provider.GetUser(creds)
 		if err != nil {
-			log.Fatalln("在尝试从%s获取用户数据时出错", provider, "-", err)
+			log.Fatalln("在尝试从获取用户数据时出错", provider, "-", err)
 		}
 
-		// 取得名称使用Base64编码,将其写入到cookie中
+		m := md5.New()
+		io.WriteString(m, strings.ToLower(user.Name()))
+		userId := fmt.Sprintf("%x", m.Sum(nil))
+		// 取得名称差使用Base64编码,将其写入到cookie中
 		authCookieValue := objx.New(map[string]interface{}{
+			"userid":     userId,
 			"name":       user.Name(),
 			"avatar_url": user.AvatarURL(),
 			"email":      user.Email(),

@@ -11,7 +11,7 @@ type client struct {
 	socket *websocket.Conn
 	// 发送消息的.
 	send chan *message
-	// 用户报在的房间.
+	// 用户所在的房间.
 	room *room
 	// 用户数据
 	userData map[string]interface{}
