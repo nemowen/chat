@@ -38,6 +38,8 @@ func (t *templateHandle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.templ.Execute(w, data)
 }
 
+var avatars Avatar = TryAvatars{FileSystemAvatar{}, AuthAvatar{}, GravatarAvatar{}}
+
 func main() {
 
 	var addr = flag.String("addr", ":1987", "The addr of the application.")
@@ -52,7 +54,7 @@ func main() {
 		google.New("key", "secret", "http://localhost:1987/auth/callback/google"),
 	)
 
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	r.tracer = trace.New(os.Stdout) // using our new trace
 	http.Handle("/login", &templateHandle{fileName: "login.html"})
 	http.HandleFunc("/logout", logout)
